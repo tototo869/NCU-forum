@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+  	<head>
+    	<meta http-equiv="Content-Type"  content="text/html; charset=UTF-8">
+    	<title>NCU論壇登入畫面</title>
+    	<link rel="stylesheet" href="statics/css/login.css">
+
+    	<script src="statics/js/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+  	</head>
+  	<body>
+    	<div class="center">
+      		<h1>登入NCU論壇</h1>
+      		<div id="flashMessage" class="message" style="display: none;"></div>
+      		<form method="post">
+       	 		<div class="txt_field">
+          			<span></span>
+          			<label>Email</label>
+          			<input name="email" maxlength="30" type="email" id="member_email" required="required" placeholder="輸入學校Gmail (@g.ncu.edu.tw)" required>
+	        	</div>
+    	    	<div class="txt_field">
+          			<span></span>
+          			<label>密碼</label>
+        	  		<input name="password" maxlength="30" type="password" id="member_password" required="required" placeholder="輸入你的密碼" required>
+	        	</div>
+                <div class="login">
+                    <input type="button" id="login" value="登入">
+                </div>
+       	 		<div class="signup_link">
+          			尚未註冊？ <a href="member_register.html">註冊</a>
+        		</div>
+	      </form>
+    	</div>
+
+  		<script type="text/javascript">
+            $(document).ready(function() {
+                // 處理表單點擊事件
+                var $form = $('#login');
+                $form.click(function() {
+                    submit();
+                });
+
+                function submit() {
+                    var email = $('#member_email').val();
+                    var password = $('#member_password').val();
+
+                    var email_rule = /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/;
+                    var ncu_rule = /^\w+((-\w+)|(\.\w+))*\@g\.ncu\.edu\.tw$/;
+                    var password_rule = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+	                if (!email_rule.test(email)) {
+    	                alert("Email格式不符！");
+	                }
+        	        else if(!ncu_rule.test(email)){
+                        alert("Email格式不符！請輸入中央大學G-suite帳號！");
+                    }
+                    else if(!password_rule.test(password)) {
+                        alert("密碼格式不符，長度至少8，且至少包含一個數字和英文字母！");
+                    }
+                    else {
+                        // 將資料組成JSON格式
+                        var data_object = {
+                            "email": email,
+                            "password": password
+                        };
+
+                        // 將JSON格式轉換成字串
+                        var data_string = JSON.stringify(data_object);
+                        
+                        sessionStorage.setItem('Email', $('#member_email').val());
+                        console.log(sessionStorage.getItem('Email'));
+							
+                        // 發出POST的AJAX請求
+                        $.ajax({
+                                type: "POST",
+                                url: "api/login.do",
+                                data: data_string,
+                                crossDomain: true,
+                                cache: false,
+                                dataType: 'json',
+                                timeout: 5000,
+                                success: function (response) {
+                                    //$('#flashMessage').html(response.message);
+                                    //$('#flashMessage').show();
+                                    if(response.status == 200){
+                                    	location.href='http://localhost:8080/NCU_MIS_SA/home.html';
+                                    	 alert("歡迎");
+                                    }
+                                },
+                                error: function () {
+                                    alert("無法連線到伺服器！");
+                                }
+                        });
+
+                        }
+                    }
+
+                });
+            </script>
+
+  </body>
+</html>

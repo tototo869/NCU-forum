@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+
+<html dir="ltr">
+<head>
+<meta charset="utf-8">
+<title>NCU論壇註冊畫面</title>
+<link rel="stylesheet" href="statics/css/index.css">
+<link rel="stylesheet" href="statics/css/newpost.css">
+	<script src="statics/js/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+</head>
+<body>
+	<div class="container">
+        <div id="content">
+            <h2>新增貼文</h2>
+            
+            <div id="flashMessage" class="message" style="display: none;"></div>
+
+            <form id="form" accept-charset="utf-8">
+                <div style="display:none;"><input type="hidden" name="_method" value="POST"></div>
+                <div class="user-details">
+                    <div class="input text required">
+                    <label for="post_group">看板分類</label>
+                    <!--  <input name="group" maxlength="30" type="text" id="post_group" required="required">-->
+                    <select  name=”group:  id="post_group" required="required">
+
+                     <option value=靠北版> 靠北版 </option>
+
+                     <option value=表特版> 表特版 </option>
+                     
+                     <option value=遺失物版> 遺失物版 </option>
+
+                   </select>
+                </div>
+                
+                <div class="input text required">
+                    <label for="post_title">標題</label>
+                    <input name="title" maxlength="30" type="text" id="post_title" required="required">
+                </div>
+                <div class="input text required">
+                    <label for="post_info">內容</label>
+                    <input name="info" maxlength="30" type="text" id="post_info" required="required" >
+                </div>
+                </div>
+                	<div class="submit"><input type="button" value="新增貼文" id="submit"></div>
+            </form>
+
+</div>
+
+
+
+	<script type="text/javascript">
+		$(document).ready(
+				function() {
+					// 處理表單點擊事件
+					var $form = $('#submit');
+					$form.click(function() {
+						submit();
+					});
+
+					function submit() {
+						var group = $('#post_group').val();
+						var title = $('#post_title').val();
+						var info = $('#post_info').val();
+
+						//var email_rule = /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/;
+
+						//資料組成JSON格式
+						var data_object = {
+							"group" : group,
+							"title" : title,
+							"info" : info
+						};
+
+						// 將JSON格式轉換成字串
+						var data_string = JSON.stringify(data_object);
+
+						// 發出POST的AJAX請求
+						$.ajax({
+							type : "POST",
+							url : "api/post.do",
+							data : data_string,
+							crossDomain : true,
+							cache : false,
+							dataType : 'json',
+							timeout : 5000,
+							success : function(response) {
+								$('#flashMessage').html(response.message);
+								$('#flashMessage').show();
+								if (response.status == 200) {
+									updateSQLTable(response.response);
+								}
+							},
+							error : function() {
+								alert("無法連線到SERVER！");
+							}
+						});
+
+					}
+
+					function updateSQLTable(data) {
+						$("#sql_log > tbody").empty();
+						var time = (data.time / 1000000).toFixed(2);
+						var table_html = "";
+
+						table_html += '<tr>';
+						table_html += '<td>' + '1' + '</td>';
+						table_html += '<td>' + data.sql + '</td>';
+						table_html += '<td style="text-align: right">' + '0'
+								+ '</td>';
+						table_html += '<td style="text-align: right">'
+								+ data.row + '</td>';
+						table_html += '<td style="text-align: right">'
+								+ data.row + '</td>';
+						table_html += '<td style="text-align: right">' + time
+								+ '</td>';
+						table_html += '</tr>';
+						$("#sql_log > tbody").append(table_html);
+						$("#sql_summary").html(
+								"(default) " + data.row + " queries took "
+										+ time + " ms");
+					}
+				});
+	</script>
+
+	</div>
+	<nav class="main-menu">
+		<ul>
+			<li class="has-subnav"><i class="fa fa-laptop fa-2x"></i></li>
+			<li class="has-subnav"><a href="love.html"> <i
+					class="fa fa-laptop fa-2x"></i> <span class="nav-text">
+						<h1>表特版</h1>
+				</span>
+			</a></li>
+			<li class="has-subnav"><i class="fa fa-laptop fa-2x"></i></li>
+			<li class="has-subnav"><a href="lost.html"> <i
+					class="fa fa-list fa-2x"></i> <span class="nav-text">
+						<h1>遺失物版</h1>
+				</span>
+			</a></li>
+			<li class="has-subnav"><i class="fa fa-laptop fa-2x"></i></li>
+			<li><a href="hate.html"> <i class="fa fa-font fa-2x"></i> <span
+					class="nav-text">
+						<h1>靠北版</h1>
+				</span>
+			</a></li>
+			<li class="has-subnav"><i class="fa fa-laptop fa-2x"></i></li>
+
+			<li><a href="home.html"> <i class="fa fa-info fa-2x"></i> <span
+					class="nav-text">
+						<h3>公告</h3>
+				</span>
+			</a></li>
+		</ul>
+
+		<ul class="logout">
+			<li><a href="#"> <i class="fa fa-power-off fa-2x"></i> <span
+					class="nav-text"> Logout </span>
+			</a></li>
+		</ul>
+	</nav>
+
+
+</body>
+
+</html>
